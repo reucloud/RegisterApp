@@ -11,15 +11,25 @@ import SwiftData
 @Model
 class Product {
 
+    var id: UUID
+    var category: Category?
     var name: String
+    var stock: Int?
+    var is_soldout: Bool
+    var is_hidden: Bool
     var price: Int
-    var junre: String
-    var category: Int
+//    var image: Data?
+    var summary: String
 
-    init(name: String, price: Int) {
+    init(category: Category? = nil, name: String, stock: Int?, price: Int, summary: String) {
+        self.id = UUID()
+        self.category = category //後からカテゴリを選択したらそのidを格納する設計にする
         self.name = name
+        self.stock = stock
+        self.is_soldout = false
+        self.is_hidden = false
         self.price = price
-        self.junre = ""
-        self.category = 0
+//        self.image = nil
+        self.summary = summary
     }
 }

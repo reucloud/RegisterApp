@@ -5,14 +5,17 @@
 //  Created by 戸崎悠真 on 2026/05/29.
 //
 
-import SwiftUI
+import Foundation
+import SwiftData
 
-struct Category: View {
-    var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+@Model
+class Category {
+
+    var id: UUID
+    var name: String
+
+    init(name: String) {
+        self.id = UUID()
+        self.name = name
     }
-}
-
-#Preview {
-    Category()
 }
