@@ -11,13 +11,14 @@ import SwiftData
 struct ContentView: View {
     @Environment(\.modelContext) private var context
     @Query private var products: [Product]
+    @Query private var categories: [Category]
     
     @State private var showEditView = false
     @State var totalPrice = 0
     @State var productCount = 0
     
     var body: some View {
-        VStack(spacing: 0) {
+        VStack(alignment: .leading, spacing: 8) {
             // ヘッダー
             HStack {
                 Text("レジ管理システム")
@@ -38,96 +39,96 @@ struct ContentView: View {
             .background(Color.blue.opacity(0.2))
             
             // メイン
-            HStack(spacing: 0) {
-                // 左メニュー
-                VStack {
-                    Text("カテゴリ")
-                        .font(.headline)
-                    Button{
-                        
-                    }label:{
-                        Text("全て")
-                    }
-                    Button{
-                        
-                    }label:{
-                        Text("飲み物")
-                    }
-                    Button{
-                        
-                    }label:{
-                        Text("お菓子")
-                    }
-                    
-                    Spacer()
-                }
-                .padding()
-                .frame(width: 200)
-                .background(Color.gray.opacity(0.1))
-                
-                // 中央の商品一覧
-                VStack {
-                    Spacer()
-                    Text("商品一覧")
-                        .font(.title2)
-                    ScrollView{
-                        VStack(alignment: .leading) {
-                            ForEach(products) { product in
-                                
+            GeometryReader { geometry in
+                HStack(spacing: 0) {
+                    // 左メニュー
+                    VStack {
+                        Text("カテゴリ")
+                            .font(.headline)
+                        ForEach(categories) { category in
+                            HStack{
                                 Button {
-                                    totalPrice += product.price
-                                    productCount += 1
-                                } label: {
-                                    VStack(alignment: .leading, spacing: 8) {
-                                        
-                                        HStack {
-                                            Text(product.name)
-                                                .font(.headline)
-                                            
-                                            Spacer()
-                                            
-                                            Text("¥\(product.price)")
-                                                .bold()
-                                        }
-                                        
-                                        Text("ジャンル: \(product.junre)")
-                                            .font(.subheadline)
-                                            .foregroundStyle(.gray)
-                                    }
-                                    .padding()
-                                    .background(Color.white)
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 12)
-                                            .stroke(Color.gray.opacity(0.4), lineWidth: 1)
-                                    )
-                                    .cornerRadius(12)
-                                    .padding(.vertical, 4)
                                     
+                                }label:{
+                                    Text(category.name)
+                                        .frame(maxWidth: .infinity)
+                                        .multilineTextAlignment(.center)
                                 }
-                                .buttonStyle(.plain)
-                                .padding()
-                                
                             }
-                            .scrollContentBackground(.hidden)
-                            .background(Color.white)
                         }
+                        
+                        Spacer()
                     }
                     .padding()
-                }
-                
-                // 右のカート
-                VStack {
-                    Text("カート")
-                        .font(.title2)
-                    Spacer()
+                    .frame(width: geometry.size.width * 0.2)
+                    .background(Color.gray.opacity(0.1))
                     
-                    Text("合計:\(productCount)点 ¥\(totalPrice)")
-                        .font(.title)
-                        .bold()
+                    // 中央の商品一覧
+                    VStack {
+                        Spacer()
+                        Text("商品一覧")
+                            .font(.title2)
+                        ScrollView{
+                            VStack(alignment: .leading) {
+                                ForEach(products) { product in
+                                    
+                                    Button {
+                                        totalPrice += product.price
+                                        productCount += 1
+                                    } label: {
+                                        VStack(alignment: .leading, spacing: 8) {
+                                            
+                                            HStack {
+                                                Text(product.name)
+                                                    .font(.headline)
+                                                
+                                                Spacer()
+                                                
+                                                Text("¥\(product.price)")
+                                                    .bold()
+                                            }
+                                            
+                                            Text("ジャンル: \(product.category?.name ?? "なし")")
+                                                .font(.subheadline)
+                                                .foregroundStyle(.gray)
+                                        }
+                                        .padding()
+                                        .background(Color.white)
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 12)
+                                                .stroke(Color.gray.opacity(0.4), lineWidth: 1)
+                                        )
+                                        .cornerRadius(12)
+                                        .padding(.vertical, 4)
+                                        
+                                    }
+                                    .buttonStyle(.plain)
+                                    //                                .padding()
+                                    
+                                }
+                                .scrollContentBackground(.hidden)
+                                .background(Color.white)
+                            }
+                        }
+                        .padding()
+                    }
+                    .padding()
+                    .frame(width: geometry.size.width * 0.6)
+                    
+                    // 右のカート
+                    VStack {
+                        Text("カート")
+                            .font(.title2)
+                        Spacer()
+                        
+                        Text("合計:\(productCount)点 ¥\(totalPrice)")
+                            .font(.title)
+                            .bold()
+                    }
+                    .padding()
+                    .frame(width: geometry.size.width * 0.2)
+                    .background(Color.orange.opacity(0.1))
                 }
-                .padding()
-                .frame(width: 300)
-                .background(Color.orange.opacity(0.1))
             }
             // フッター
             HStack {
@@ -151,6 +152,3 @@ struct ContentView: View {
     }
 }
 
-#Preview {
-    ContentView()
-}
