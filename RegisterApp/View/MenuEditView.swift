@@ -15,13 +15,35 @@ struct MenuEditView: View {
     @Query private var categories: [Category]
     
     @State private var showEditView = false
+    @State private var addCategory = ""
+    
+    //    新規追加用の変数
     @State private var productName = ""
     @State private var productPrice = 0
-    @State private var productCategory = ""
-    @State private var addCategory = ""
+    @State private var productCategoryName = ""
+    @State private var selectedCategory: Category?
     @State private var productStock = 0
     
-        var body: some View {
+    //    製品編集用の変数
+    @State private var editProductName = ""
+    @State private var editProductPrice = 0
+    @State private var editProductCategoryName = ""
+    @State private var editSelectedCategory: Category?
+    @State private var editProductStock = 0
+
+    @State private var editingProduct: Product?
+    
+    @State private var editProduct: Bool = false
+    
+    //    列数を3列にする
+    private let columns = [
+        GridItem(.flexible()),
+        GridItem(.flexible()),
+        GridItem(.flexible())
+    ]
+    
+    var body: some View {
+        ZStack {
             VStack(spacing: 0) {
                 // ヘッダー
                 HStack {
@@ -42,16 +64,31 @@ struct MenuEditView: View {
                         VStack {
                             Text("カテゴリ")
                                 .font(.headline)
-                            ForEach(categories) { category in
-                                HStack{
-                                    Button {
+                            ScrollView{
+                                ForEach(categories) { category in
+                                    ZStack {
+                                        Button {
+                                            // `products` is a read-only query result. Delete via the model context instead.
+                                        } label: {
+                                            Text(category.name)
+                                                .frame(maxWidth: .infinity)
+                                                .multilineTextAlignment(.center)
+                                        }
                                         
-                                    }label:{
-                                        Text(category.name)
-                                            .frame(maxWidth: .infinity)
-                                            .multilineTextAlignment(.center)
+                                        HStack {
+                                            Spacer()
+                                            
+                                            if category.name != "すべて"{
+                                                Button {
+                                                    context.delete(category)
+                                                    try? context.save()
+                                                } label: {
+                                                    Image(systemName: "trash")
+                                                }
+                                            }
+                                        }
                                     }
-                                    Spacer()
+                                    .foregroundStyle(.black)
                                 }
                             }
                             
@@ -78,35 +115,80 @@ struct MenuEditView: View {
                                     )
                             }
                         }
-                        .padding()
+//                        .padding()
                         .frame(width: geometry.size.width * 0.2)
                         .background(Color.gray.opacity(0.1))
                         
                         // 中央の商品一覧
                         VStack {
-                            HStack{
                                 Text("商品設定")
-                                Spacer()
-                                Text("カテゴリ設定")
-                            }
                             .font(.title2)
-                            List {
-                                ForEach(products) { product in
-                                    HStack {
-                                        Text(product.name)
-                                        Spacer()
-                                        Text("¥\(product.price)")
+                            //                            List {
+                            ScrollView {
+                                LazyVGrid(columns: columns) {
+                                    ForEach(products.indices, id: \.self) { index in
+                                        let product = products[index]
+                                        Button{
+                                            editingProduct = product
+                                            editProductName = product.name
+                                            editProductPrice = product.price
+                                            editSelectedCategory = product.category
+                                            editProductCategoryName = product.category?.name ?? ""
+                                            editProductStock = product.stock ?? 0
+                                            editProduct = true
+                                        }label:{
+                                            VStack(alignment: .leading, spacing: 8) {
+                                                
+                                                HStack {
+                                                    Text(product.name)
+                                                        .font(.headline)
+                                                    Text(product.stock == nil ? "余裕あり" : "在庫: \(product.stock!)")
+                                                    
+                                                    Spacer()
+                                                    
+                                                    Button{
+                                                        context.delete(product)
+                                                        try? context.save()
+                                                    }label:{
+                                                        Image(systemName: "trash")
+                                                    }
+                                                    
+                                                }
+                                                HStack{
+                                                    Text("ジャンル: \(product.category?.name ?? "なし")")
+                                                        .font(.subheadline)
+                                                        .foregroundStyle(.gray)
+                                                    
+                                                    Spacer()
+                                                    
+                                                    Text("¥\(product.price)")
+                                                        .bold()
+                                                }
+                                            }
+                                            .padding()
+                                            .background(Color.white)
+                                            .overlay(
+                                                RoundedRectangle(cornerRadius: 12)
+                                                    .stroke(Color.gray.opacity(0.4), lineWidth: 1)
+                                            )
+                                            .cornerRadius(12)
+                                            .padding(.vertical, 4)
+                                        }
+                                        .foregroundStyle(.black)
                                     }
                                 }
                             }
+                            //                                .overScreenCover(isPresented: $editProduct) {
+                            
+                            //                            }
                         }
                         .frame(width: geometry.size.width * 0.6)
-                        .padding()
+//                        .padding()
                         
                         // 右のカート
                         
                         VStack {
-                            Text("編集欄")
+                            Text("商品追加欄")
                                 .font(.title2)
                             Spacer()
                             
@@ -118,40 +200,46 @@ struct MenuEditView: View {
                                 .keyboardType(.numberPad)
                             
                             Text("カテゴリ")
-                            TextField("商品名を入力", text: $productCategory)
+                            TextField("商品名を入力", text: $productCategoryName)
                             
                             Text("在庫")
                             TextField("商品名を入力", value: $productStock, format: .number)
                                 .keyboardType(.numberPad)
                             
-                            Text("合計: ¥0")
-                                .font(.title)
-                                .bold()
+                            Button{
+                                let product = Product(
+                                    category: selectedCategory,
+                                    name: productName,
+                                    stock: productStock,
+                                    price: productPrice,
+                                    summary: ""
+                                )
+                                
+                                context.insert(product)
+                                try? context.save()
+                            }label:{
+                                Text("保存")
+                                    .frame(maxWidth: .infinity)
+                                    .padding(8)
+                                    .foregroundStyle(.white)
+                                    .background(Color.blue)
+                                    .clipShape(
+                                        RoundedRectangle(cornerRadius: 8)
+                                    )
+                                
+                            }
                         }
-                        .padding()
+//                        .padding()
                         .frame(width: geometry.size.width * 0.2)
                         .background(Color.orange.opacity(0.1))
                     }
                 }
+                .padding()
                 // フッター
                 HStack {
-                    Button("キャンセル") {
-                        dismiss()
-                    }
-                    .buttonStyle(.bordered)
-                    
                     Spacer()
-                    
-                    Button("保存") {
-                        let product = Product(
-                            name: "コーラ",
-                            stock: nil,
-                            price: 150,
-                            summary: ""
-                        )
-                        
-                        context.insert(product)
-                        try? context.save()
+                    Button("オーダー画面へ") {
+                        dismiss()
                     }
                     .buttonStyle(.borderedProminent)
                 }
@@ -159,5 +247,22 @@ struct MenuEditView: View {
                 .frame(maxWidth: .infinity)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
+            if editProduct {
+
+                Color.black.opacity(0.3)
+                    .ignoresSafeArea()
+
+                if let editingProduct {
+                    ProductEditView(
+                        product: editingProduct,
+                        productName: $editProductName,
+                        productPrice: $editProductPrice,
+                        productCategory: $editSelectedCategory,
+                        productStock: $editProductStock,
+                        isPresented: $editProduct
+                    )
+                }
+            }
         }
+    }
 }

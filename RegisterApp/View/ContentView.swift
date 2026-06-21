@@ -16,6 +16,7 @@ struct ContentView: View {
     @State private var showEditView = false
     @State var totalPrice = 0
     @State var productCount = 0
+    @State var selectedCategory: String = "すべて"
     
     @State private var cartItems: [CartItem] = [] // カートに入れた商品を格納する配列
     
@@ -57,7 +58,7 @@ struct ContentView: View {
                         ForEach(categories) { category in
                             HStack{
                                 Button {
-                                    
+                                    selectedCategory = category.name
                                 }label:{
                                     Text(category.name)
                                         .frame(maxWidth: .infinity)
@@ -75,60 +76,60 @@ struct ContentView: View {
                     // 中央の商品一覧
                     VStack {
                         Spacer()
-                        Text("商品一覧")
+                        Text("商品一覧(\(selectedCategory))")
                             .font(.title2)
                         ScrollView{
                             VStack(alignment: .leading) {
                                 LazyVGrid(columns: columns) {
-                                    ForEach(products) { product in
-                                        
-                                        Button {
-                                            if let index = cartItems.firstIndex(where: {
-                                                
-                                                $0.product.id == product.id
-                                                
-                                            }) {
-                                                cartItems[index].quantity += 1
-                                            }else{
-                                                cartItems.append(
-                                                    CartItem(
-                                                        product: product,
-                                                        quantity: 1
-                                                    )
-                                                )
-                                            }
-                                        } label: {
-                                            VStack(alignment: .leading, spacing: 8) {
-                                                
-                                                HStack {
-                                                    Text(product.name)
-                                                        .font(.headline)
-                                                    Text(product.stock == nil ? "余裕あり" : "在庫: \(product.stock!)")
-                                                    
-                                                    Spacer()
-                                                    
-                                                    Text("¥\(product.price)")
-                                                        .bold()
-                                                    
-                                                }
-                                                
-                                                Text("ジャンル: \(product.category?.name ?? "なし")")
-                                                    .font(.subheadline)
-                                                    .foregroundStyle(.gray)
-                                            }
-                                            .padding()
-                                            .background(Color.white)
-                                            .overlay(
-                                                RoundedRectangle(cornerRadius: 12)
-                                                    .stroke(Color.gray.opacity(0.4), lineWidth: 1)
-                                            )
-                                            .cornerRadius(12)
-                                            .padding(.vertical, 4)
+                                    ForEach(products){ product in
+                                        if selectedCategory == "すべて" || product.category?.name == selectedCategory {
                                             
+                                            Button {
+                                                if let index = cartItems.firstIndex(where: {
+                                                    
+                                                    $0.product.id == product.id
+                                                    
+                                                }) {
+                                                    cartItems[index].quantity += 1
+                                                }else{
+                                                    cartItems.append(
+                                                        CartItem(
+                                                            product: product,
+                                                            quantity: 1
+                                                        )
+                                                    )
+                                                }
+                                            } label: {
+                                                VStack(alignment: .leading, spacing: 8) {
+                                                    
+                                                    HStack {
+                                                        Text(product.name)
+                                                            .font(.headline)
+                                                        
+                                                        Spacer()
+                                                        
+                                                        Text("¥\(product.price)")
+                                                            .bold()
+                                                    }
+                                                        Text("ジャンル: \(product.category?.name ?? "なし")")
+                                                            .font(.subheadline)
+                                                            .foregroundStyle(.gray)
+                                                        Spacer()
+                                                    Text(product.stock == nil ? "余裕あり" : "在庫: \(product.stock!)")
+                                                }
+                                                .padding()
+                                                .background(Color.white)
+                                                .overlay(
+                                                    RoundedRectangle(cornerRadius: 12)
+                                                        .stroke(Color.gray.opacity(0.4), lineWidth: 1)
+                                                )
+                                                .cornerRadius(12)
+                                                .padding(.vertical, 4)
+                                                
+                                            }
+                                            .buttonStyle(.plain)
+                                            //                                .padding()
                                         }
-                                        .buttonStyle(.plain)
-                                        //                                .padding()
-                                        
                                     }
                                     .scrollContentBackground(.hidden)
                                     .background(Color.white)
