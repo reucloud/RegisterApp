@@ -114,6 +114,24 @@ struct MenuEditView: View {
                                         RoundedRectangle(cornerRadius: 8)
                                     )
                             }
+//                            Button("ついか") {
+//                                let category = Category(name: addCategory)
+//
+//                                context.insert(category)
+//
+//                                do {
+//                                    try context.save()
+//
+//                                    print("保存成功")
+//
+//                                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+//                                        print("1秒後カテゴリ数:", categories.count)
+//                                    }
+//
+//                                } catch {
+//                                    print(error)
+//                                }
+//                            }
                         }
 //                        .padding()
                         .frame(width: geometry.size.width * 0.2)
@@ -146,11 +164,16 @@ struct MenuEditView: View {
                                                     
                                                     Spacer()
                                                     
-                                                    Button{
-                                                        context.delete(product)
-                                                        try? context.save()
-                                                    }label:{
-                                                        Image(systemName: "trash")
+                                                    Button {
+                                                        product.is_hidden.toggle()
+                                                        
+                                                        do {
+                                                            try context.save()
+                                                        } catch {
+                                                            print("保存失敗:", error)
+                                                        }
+                                                    } label: {
+                                                        Image(systemName: product.is_hidden ? "eye.slash.fill" : "eye.fill")
                                                     }
                                                     
                                                 }

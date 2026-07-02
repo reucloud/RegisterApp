@@ -14,6 +14,9 @@ struct RegisterAppApp: App {
         WindowGroup {
             ContentView()
         }
-        .modelContainer(for: Product.self)
+        .modelContainer(for: [
+            Product.self,
+            Category.self
+        ])
     }
 }
