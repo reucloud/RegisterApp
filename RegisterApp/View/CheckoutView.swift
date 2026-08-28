@@ -41,10 +41,23 @@ struct CheckoutView: View {
                 }
             }
             HStack{
+                Button("閉じる") {
+                    isPresented = false
+                }
+                .buttonStyle(.borderedProminent)
+                
+                Spacer()
+                
                 Button("購入") {
                     let cartId = Int(Date().timeIntervalSince1970)
 
                     for item in cartItems {
+                        if let stock = item.product.stock {
+                            item.product.stock = stock - item.quantity
+//                            if item.product.stock! <= 0 {
+//                                item.product.is_soldout = true
+//                            }
+                        }
                         let sale = Sale(
                             cart_id: cartId,
                             product: item.product,
@@ -60,12 +73,6 @@ struct CheckoutView: View {
                     } catch {
                         print("売上保存失敗:", error)
                     }
-                }
-
-                Spacer()
-
-                Button("閉じる") {
-                    isPresented = false
                 }
                 .buttonStyle(.borderedProminent)
             }

@@ -9,15 +9,31 @@ import SwiftUI
 import SwiftData
 
 struct SalesView: View {
+    @Environment(\.dismiss) var dismiss
     @Environment(\.modelContext) private var context
     @Query private var products: [Product]
     @Query private var categories: [Category]
     
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        ZStack {
+            VStack(spacing: 0) {
+                // ヘッダー
+                HStack {
+                    Text("商品編集画面")
+                        .font(.largeTitle)
+                        .bold()
+                    Spacer()
+                    Text("2026/05/17")
+                    Button("オーダー画面へ") {
+                        dismiss()
+                    }
+                }
+                .padding()
+//                .frame(maxWidth: .infinity)
+                .background(Color.blue.opacity(0.2))
+                
+                
+            }
+        }
     }
-}
-
-#Preview {
-    SalesView()
 }

@@ -11,39 +11,57 @@ import SwiftData
 struct ProductEditView: View {
     @Query private var categories: [Category]
     @Environment(\.modelContext) private var context
-
+    
     var product: Product
-
+    
     @Binding var productName: String
     @Binding var productPrice: Int
     @Binding var productCategory: Category?
-    @Binding var productStock: Int
-
+    @Binding var productStock: Int?
+    
     @Binding var isPresented: Bool
-
+    @State var isDeleteCheck: Bool = false
+    
     var body: some View {
-
+        
         VStack(alignment: .leading, spacing: 16) {
-
-            Text("商品編集")
-                .font(.title2)
-                .bold()
-
+            HStack{
+                Text("商品編集")
+                    .font(.title2)
+                    .bold()
+                
+                Spacer()
+                
+                Button{
+                    isDeleteCheck = true
+                }label:{
+                    Image(systemName: "trash")
+                        .foregroundColor(.red)
+                }
+            }
+            .alert("このメニューを削除しますか？", isPresented: $isDeleteCheck) {
+                Button("削除", role: .destructive) {
+                    context.delete(product)
+                    try? context.save()
+                    isPresented = false
+                }
+            }
+            
             HStack {
                 Text("名前")
                     .frame(width: 70, alignment: .leading)
-
+                
                 TextField(
                     "商品名",
                     text: $productName
                 )
                 .textFieldStyle(.roundedBorder)
             }
-
+            
             HStack {
                 Text("価格")
                     .frame(width: 70, alignment: .leading)
-
+                
                 TextField(
                     "価格",
                     value: $productPrice,
@@ -72,11 +90,11 @@ struct ProductEditView: View {
                         .stroke(Color.gray.opacity(0.4), lineWidth: 1)
                 )
             }
-
+            
             HStack {
                 Text("在庫")
                     .frame(width: 70, alignment: .leading)
-
+                
                 TextField(
                     "在庫",
                     value: $productStock,
@@ -84,15 +102,15 @@ struct ProductEditView: View {
                 )
                 .textFieldStyle(.roundedBorder)
             }
-
+            
             HStack {
-
+                
                 Button("キャンセル") {
                     isPresented = false
                 }
-
+                
                 Spacer()
-
+                
                 Button("保存") {
                     product.category = productCategory
                     product.name = productName

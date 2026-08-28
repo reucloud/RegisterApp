@@ -94,14 +94,18 @@ struct ContentView: View {
                                         ForEach(products){ product in
                                             if selectedCategory == "すべて" || product.category?.name == selectedCategory { //カテゴリの条件
                                                 if !product.is_hidden {
+                                                    
+                                                    let cartQuantity = cartItems.first(where: {
+                                                        $0.product.id == product.id
+                                                    })?.quantity ?? 0
+                                                    
+                                                    
                                                     Button {
                                                         if let index = cartItems.firstIndex(where: {
-                                                            
                                                             $0.product.id == product.id
-                                                            
                                                         }) {
                                                             cartItems[index].quantity += 1
-                                                        }else{
+                                                        } else {
                                                             cartItems.append(
                                                                 CartItem(
                                                                     product: product,
@@ -111,7 +115,6 @@ struct ContentView: View {
                                                         }
                                                     } label: {
                                                         VStack(alignment: .leading, spacing: 8) {
-                                                            
                                                             HStack {
                                                                 Text(product.name)
                                                                     .font(.headline)
@@ -121,35 +124,48 @@ struct ContentView: View {
                                                                 Text("¥\(product.price)")
                                                                     .bold()
                                                             }
+                                                            
                                                             Text("ジャンル: \(product.category?.name ?? "なし")")
                                                                 .font(.subheadline)
                                                                 .foregroundStyle(.gray)
+                                                            
                                                             Spacer()
-                                                            Text(product.stock == nil ? "余裕あり" : "在庫: \(product.stock!)")
+                                                            
+                                                            if let stock = product.stock {
+                                                                Text("在庫: \(stock)")
+                                                            } else {
+                                                                Text("在庫管理なし")
+                                                            }
                                                         }
                                                         .padding()
-                                                        .background((product.is_soldout || product.stock == 0) ? Color.gray : Color.white)
-                                                        
+                                                        .background(
+                                                            product.is_soldout ||
+                                                            (product.stock != nil && product.stock! - cartQuantity <= 0)
+                                                            ? Color.gray
+                                                            : Color.white
+                                                        )
                                                         .overlay(
                                                             RoundedRectangle(cornerRadius: 12)
-                                                                .stroke(Color.gray.opacity(0.4), lineWidth: 1)
+                                                                .stroke(
+                                                                    Color.gray.opacity(0.4),
+                                                                    lineWidth: 1
+                                                                )
                                                         )
                                                         .cornerRadius(12)
                                                         .padding(.vertical, 4)
-                                                        
                                                     }
                                                     .buttonStyle(.plain)
-                                                    .disabled(product.is_soldout || product.stock == 0)
-                                                    //                                .padding()
+                                                    .disabled(
+                                                        product.is_soldout ||
+                                                        (product.stock != nil && product.stock! - cartQuantity <= 0)
+                                                    )
                                                 }
                                             }
                                         }
-                                        .scrollContentBackground(.hidden)
-                                        .background(Color.white)
                                     }
+                                    .padding()
                                 }
                             }
-                            .padding()
                         }
                         .padding()
                         .frame(width: geometry.size.width * 0.6)
@@ -267,4 +283,3 @@ struct ContentView: View {
         }
     }
 }
-    

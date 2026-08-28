@@ -20,16 +20,16 @@ struct MenuEditView: View {
     //    新規追加用の変数
     @State private var productName = ""
     @State private var productPrice = 0
-    @State private var productCategoryName = ""
+    @State private var productCategory = ""
     @State private var selectedCategory: Category?
-    @State private var productStock = 0
+    @State private var productStock: Int? = nil
     
     //    製品編集用の変数
     @State private var editProductName = ""
     @State private var editProductPrice = 0
     @State private var editProductCategoryName = ""
     @State private var editSelectedCategory: Category?
-    @State private var editProductStock = 0
+    @State private var editProductStock: Int? = nil
 
     @State private var editingProduct: Product?
     
@@ -67,13 +67,10 @@ struct MenuEditView: View {
                             ScrollView{
                                 ForEach(categories) { category in
                                     ZStack {
-                                        Button {
-                                            // `products` is a read-only query result. Delete via the model context instead.
-                                        } label: {
+
                                             Text(category.name)
                                                 .frame(maxWidth: .infinity)
                                                 .multilineTextAlignment(.center)
-                                        }
                                         
                                         HStack {
                                             Spacer()
@@ -114,26 +111,8 @@ struct MenuEditView: View {
                                         RoundedRectangle(cornerRadius: 8)
                                     )
                             }
-//                            Button("ついか") {
-//                                let category = Category(name: addCategory)
-//
-//                                context.insert(category)
-//
-//                                do {
-//                                    try context.save()
-//
-//                                    print("保存成功")
-//
-//                                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-//                                        print("1秒後カテゴリ数:", categories.count)
-//                                    }
-//
-//                                } catch {
-//                                    print(error)
-//                                }
-//                            }
                         }
-//                        .padding()
+                        .padding()
                         .frame(width: geometry.size.width * 0.2)
                         .background(Color.gray.opacity(0.1))
                         
@@ -152,7 +131,7 @@ struct MenuEditView: View {
                                             editProductPrice = product.price
                                             editSelectedCategory = product.category
                                             editProductCategoryName = product.category?.name ?? ""
-                                            editProductStock = product.stock ?? 0
+                                            editProductStock = product.stock
                                             editProduct = true
                                         }label:{
                                             VStack(alignment: .leading, spacing: 8) {
@@ -160,7 +139,11 @@ struct MenuEditView: View {
                                                 HStack {
                                                     Text(product.name)
                                                         .font(.headline)
-                                                    Text(product.stock == nil ? "余裕あり" : "在庫: \(product.stock!)")
+                                                    Text(
+                                                        product.stock == nil
+                                                            ? "在庫管理なし"
+                                                            : "在庫: \(product.stock!)"
+                                                    )
                                                     
                                                     Spacer()
                                                     
@@ -205,6 +188,7 @@ struct MenuEditView: View {
                             
                             //                            }
                         }
+                        .padding()
                         .frame(width: geometry.size.width * 0.6)
 //                        .padding()
                         
@@ -222,8 +206,26 @@ struct MenuEditView: View {
                             TextField("商品名を入力", value: $productPrice, format: .number)
                                 .keyboardType(.numberPad)
                             
-                            Text("カテゴリ")
-                            TextField("商品名を入力", text: $productCategoryName)
+                            VStack {
+                                Text("カテゴリ")
+                                    .frame(width: 70, alignment: .leading)
+                                Picker("カテゴリ", selection: $selectedCategory) {
+                                    ForEach(categories) { category in
+                                        Text(category.name)
+                                            .tag(category as Category?)
+                                    }
+                                }
+                                .pickerStyle(.menu)
+                                .tint(.black)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 8)
+                                .background(Color.white)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 6)
+                                        .stroke(Color.gray.opacity(0.4), lineWidth: 1)
+                                )
+                            }
                             
                             Text("在庫")
                             TextField("商品名を入力", value: $productStock, format: .number)
@@ -253,6 +255,7 @@ struct MenuEditView: View {
                             }
                         }
 //                        .padding()
+                        .padding()
                         .frame(width: geometry.size.width * 0.2)
                         .background(Color.orange.opacity(0.1))
                     }
