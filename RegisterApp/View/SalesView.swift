@@ -20,11 +20,17 @@ struct SalesView: View {
     @State private var selectedMonth: Int = Calendar.current.component(.month, from: Date())
     @State private var selectedDay: Int = Calendar.current.component(.day, from: Date())
     
-    let calendar = Calendar.current
     let currentYear = Calendar.current.component(.year, from: Date())
     let years = Array(2020...Calendar.current.component(.year, from: Date()))
     let months = Array(1...12)
     let days = Array(1...31)
+    
+    private let columns = [
+        GridItem(.flexible()),
+        GridItem(.flexible()),
+        GridItem(.flexible()),
+        GridItem(.flexible())
+    ]
     
     var body: some View {
         ZStack {
@@ -46,92 +52,278 @@ struct SalesView: View {
                 
                 // メイン
                 VStack(alignment: .leading) {
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 12) {
-                            
-                            // 年別ボタン
-                            Button {
-                                selectedPeriod = "年別"
-                            } label: {
-                                Text("年別")
+                    Spacer()
+                    ScrollView(.vertical, showsIndicators: true) {
+
+                        VStack(alignment: .leading, spacing: 20) {
+                            // ボタン・ドロップダウン
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(spacing: 12) {
+
+                                    ForEach(["年別", "月別", "日別"], id: \.self) { period in
+                                        Button {
+                                            selectedPeriod = period
+                                        } label: {
+                                            Text(period)
+                                                .font(.headline)
+                                                .foregroundStyle(.black)
+                                                .frame(width: 80, height: 40)
+                                                .background(
+                                                    selectedPeriod == period
+                                                    ? Color.blue.opacity(0.2)
+                                                    : Color.white
+                                                )
+                                                .overlay(
+                                                    RoundedRectangle(cornerRadius: 8)
+                                                        .stroke(Color.black, lineWidth: 1)
+                                                )
+                                                .cornerRadius(8)
+                                        }
+                                    }
+
+                                    // 年別
+                                    if selectedPeriod == "年別" {
+
+                                        Picker("年", selection: $selectedYear) {
+                                            ForEach(2020...currentYear, id: \.self) { year in
+                                                Text("\(year)年")
+                                                    .tag(year)
+                                            }
+                                        }
+                                        .pickerStyle(.menu)
+                                        .tint(.black)
+                                        .frame(minWidth: 80, minHeight: 40)
+                                        .padding(.horizontal, 8)
+                                        .background(Color.white)
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 8)
+                                                .stroke(Color.black, lineWidth: 1)
+                                        )
+                                        .cornerRadius(8)
+
+                                    // 月別
+                                    } else if selectedPeriod == "月別" {
+
+                                        Picker("年", selection: $selectedYear) {
+                                            ForEach(2020...currentYear, id: \.self) { year in
+                                                Text("\(year)年")
+                                                    .tag(year)
+                                            }
+                                        }
+                                        .pickerStyle(.menu)
+                                        .tint(.black)
+                                        .frame(minWidth: 80, minHeight: 40)
+                                        .padding(.horizontal, 8)
+                                        .background(Color.white)
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 8)
+                                                .stroke(Color.black, lineWidth: 1)
+                                        )
+                                        .cornerRadius(8)
+
+                                        Picker("月", selection: $selectedMonth) {
+                                            ForEach(1...12, id: \.self) { month in
+                                                Text("\(month)月")
+                                                    .tag(month)
+                                            }
+                                        }
+                                        .pickerStyle(.menu)
+                                        .tint(.black)
+                                        .frame(minWidth: 80, minHeight: 40)
+                                        .padding(.horizontal, 8)
+                                        .background(Color.white)
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 8)
+                                                .stroke(Color.black, lineWidth: 1)
+                                        )
+                                        .cornerRadius(8)
+
+                                    // 日別
+                                    } else {
+
+                                        Picker("年", selection: $selectedYear) {
+                                            ForEach(2020...currentYear, id: \.self) { year in
+                                                Text("\(year)年")
+                                                    .tag(year)
+                                            }
+                                        }
+                                        .pickerStyle(.menu)
+                                        .tint(.black)
+                                        .frame(minWidth: 80, minHeight: 40)
+                                        .padding(.horizontal, 8)
+                                        .background(Color.white)
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 8)
+                                                .stroke(Color.black, lineWidth: 1)
+                                        )
+                                        .cornerRadius(8)
+
+                                        Picker("月", selection: $selectedMonth) {
+                                            ForEach(1...12, id: \.self) { month in
+                                                Text("\(month)月")
+                                                    .tag(month)
+                                            }
+                                        }
+                                        .pickerStyle(.menu)
+                                        .tint(.black)
+                                        .frame(minWidth: 80, minHeight: 40)
+                                        .padding(.horizontal, 8)
+                                        .background(Color.white)
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 8)
+                                                .stroke(Color.black, lineWidth: 1)
+                                        )
+                                        .cornerRadius(8)
+
+                                        Picker("日", selection: $selectedDay) {
+                                            ForEach(1...31, id: \.self) { day in
+                                                Text("\(day)日")
+                                                    .tag(day)
+                                            }
+                                        }
+                                        .pickerStyle(.menu)
+                                        .tint(.black)
+                                        .frame(minWidth: 80, minHeight: 40)
+                                        .padding(.horizontal, 8)
+                                        .background(Color.white)
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 8)
+                                                .stroke(Color.black, lineWidth: 1)
+                                        )
+                                        .cornerRadius(8)
+                                    }
+                                }
                             }
-                            
-                            // 月別ボタン
-                            Button {
-                                selectedPeriod = "月別"
-                            } label: {
-                                Text("月別")
+
+                            // 売上情報
+                            LazyVGrid(
+                                columns: columns,
+                                spacing: 20
+                            ) {
+
+                                VStack(alignment: .leading, spacing: 8) {
+                                    Text("売上件数")
+                                        .font(.headline)
+                                    Spacer()
+
+                                        HStack {
+                                            Spacer()
+
+                                            Text("0件")
+                                                .font(.title2)
+                                                .bold()
+
+                                            Spacer()
+                                        }
+
+                                        Spacer()
+                                }
+                                .frame(maxWidth: .infinity, minHeight: 50, alignment: .topLeading)
+                                .padding()
+                                .background(Color.white)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(
+                                            Color.gray.opacity(0.4),
+                                            lineWidth: 1
+                                        )
+                                )
+                                .cornerRadius(12)
+
+                                VStack(alignment: .leading, spacing: 8) {
+                                    Text("合計売上")
+                                        .font(.headline)
+                                    Spacer()
+
+                                        HStack {
+                                            Spacer()
+
+                                            Text("￥0")
+                                                .font(.title2)
+                                                .bold()
+
+                                            Spacer()
+                                        }
+
+                                        Spacer()
+                                }
+                                .frame(maxWidth: .infinity, minHeight: 50)
+                                .padding()
+                                .background(Color.white)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(
+                                            Color.gray.opacity(0.4),
+                                            lineWidth: 1
+                                        )
+                                )
+                                .cornerRadius(12)
+
+                                VStack(alignment: .leading, spacing: 8) {
+                                    Text("平均会計金額")
+                                        .font(.headline)
+                                    Spacer()
+
+                                        HStack {
+                                            Spacer()
+
+                                            Text("￥0")
+                                                .font(.title2)
+                                                .bold()
+
+                                            Spacer()
+                                        }
+
+                                        Spacer()
+                                }
+                                .frame(maxWidth: .infinity, minHeight: 50)
+                                .padding()
+                                .background(Color.white)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(
+                                            Color.gray.opacity(0.4),
+                                            lineWidth: 1
+                                        )
+                                )
+                                .cornerRadius(12)
+
+                                VStack(alignment: .leading, spacing: 8) {
+                                    Text("商品販売数")
+                                        .font(.headline)
+                                    Spacer()
+
+                                        HStack {
+                                            Spacer()
+
+                                            Text("0点")
+                                                .font(.title2)
+                                                .bold()
+
+                                            Spacer()
+                                        }
+
+                                        Spacer()
+                                }
+                                .frame(maxWidth: .infinity, minHeight: 50)
+                                .padding()
+                                .background(Color.white)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(
+                                            Color.gray.opacity(0.4),
+                                            lineWidth: 1
+                                        )
+                                )
+                                .cornerRadius(12)
                             }
-                            
-                            // 日別ボタン
-                            Button {
-                                selectedPeriod = "日別"
-                            } label: {
-                                Text("日別")
-                            }
-                            
-                            // 年別
-                            if selectedPeriod == "年別" {
-                                
-                                Picker("年", selection: $selectedYear) {
-                                    ForEach(2020...currentYear, id: \.self) { year in
-                                        Text("\(year)年")
-                                            .tag(year)
-                                    }
-                                }
-                                .pickerStyle(.menu)
-                                
-                                // 月別
-                            } else if selectedPeriod == "月別" {
-                                
-                                Picker("年", selection: $selectedYear) {
-                                    ForEach(2020...currentYear, id: \.self) { year in
-                                        Text("\(year)年")
-                                            .tag(year)
-                                    }
-                                }
-                                .pickerStyle(.menu)
-                                
-                                Picker("月", selection: $selectedMonth) {
-                                    ForEach(1...12, id: \.self) { month in
-                                        Text("\(month)月")
-                                            .tag(month)
-                                    }
-                                }
-                                .pickerStyle(.menu)
-                                
-                                // 日別
-                            } else {
-                                
-                                Picker("年", selection: $selectedYear) {
-                                    ForEach(2020...currentYear, id: \.self) { year in
-                                        Text("\(year)年")
-                                            .tag(year)
-                                    }
-                                }
-                                .pickerStyle(.menu)
-                                
-                                Picker("月", selection: $selectedMonth) {
-                                    ForEach(1...12, id: \.self) { month in
-                                        Text("\(month)月")
-                                            .tag(month)
-                                    }
-                                }
-                                .pickerStyle(.menu)
-                                
-                                Picker("日", selection: $selectedDay) {
-                                    ForEach(1...31, id: \.self) { day in
-                                        Text("\(day)日")
-                                            .tag(day)
-                                    }
-                                }
-                                .pickerStyle(.menu)
-                            }
+                            .frame(maxWidth: .infinity)
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .frame(maxWidth: .infinity)
                 }
+                .frame(maxWidth: .infinity)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal)
             }
